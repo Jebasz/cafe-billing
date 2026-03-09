@@ -22,7 +22,7 @@ public class StartupInitializer implements CommandLineRunner {
         // Create default shop
         Shop shop;
 
-      /*  if(shopRepository.count() == 0){
+       if(shopRepository.count() == 0){
 
             shop = Shop.builder()
                     .shopName("Main Coffee Shop")
@@ -53,7 +53,7 @@ public class StartupInitializer implements CommandLineRunner {
 
             System.out.println("DEFAULT ADMIN CREATED");
 
-        }*/
+        }
 
     }
 }

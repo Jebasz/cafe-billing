@@ -19,7 +19,7 @@ public class StartupInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        // Create default shop
+    /*    // Create default shop
         Shop shop;
 
        if(shopRepository.count() == 0){
@@ -53,7 +53,7 @@ public class StartupInitializer implements CommandLineRunner {
 
             System.out.println("DEFAULT ADMIN CREATED");
 
-        }
+        }*/
 
     }
 }

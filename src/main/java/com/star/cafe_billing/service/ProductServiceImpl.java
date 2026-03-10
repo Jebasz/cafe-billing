@@ -1,5 +1,7 @@
 package com.star.cafe_billing.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.star.cafe_billing.dto.ProductRequest;
 import com.star.cafe_billing.dto.ProductResponse;
 import com.star.cafe_billing.entity.Category;
@@ -15,9 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +29,9 @@ public class ProductServiceImpl implements ProductService {
     private final ShopRepository shopRepository;
     private final SubProductRepository subProductRepository;
 
-    private static final String UPLOAD_DIR = "uploads/products/";
+    private final Cloudinary cloudinary;
 
-    // ✅ CREATE PRODUCT (JSON API)
+    // CREATE PRODUCT (JSON API)
     @Override
     public Product createProduct(ProductRequest request){
 
@@ -61,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
-    // 🔥 CREATE PRODUCT WITH IMAGE
+    // CREATE PRODUCT WITH IMAGE (CLOUDINARY)
     @Override
     public Product createProductWithImage(
             String name,
@@ -89,17 +90,15 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() ->
                             new RuntimeException("SubProduct not found"));
 
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            // Upload image to Cloudinary
+            Map uploadResult = cloudinary.uploader().upload(
+                    image.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "cafe-products"
+                    )
+            );
 
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
-
-            Path filePath = uploadPath.resolve(fileName);
-
-            Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            String imageUrl = uploadResult.get("secure_url").toString();
 
             Product product = new Product();
 
@@ -110,7 +109,8 @@ public class ProductServiceImpl implements ProductService {
             product.setSubProduct(subProduct);
             product.setActive(true);
 
-            product.setImageUrl("/uploads/products/" + fileName);
+            // Save Cloudinary URL
+            product.setImageUrl(imageUrl);
 
             return productRepository.save(product);
 
@@ -207,7 +207,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
-    // 🔍 SEARCH PRODUCTS
+    // SEARCH PRODUCTS
     @Override
     public List<Product> searchProducts(Long shopId, String keyword) {
 

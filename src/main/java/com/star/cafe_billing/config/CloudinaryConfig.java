@@ -1,11 +1,9 @@
 package com.star.cafe_billing.config;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class CloudinaryConfig {
@@ -13,12 +11,14 @@ public class CloudinaryConfig {
     @Bean
     public Cloudinary cloudinary() {
 
-        Map<String, String> config = new HashMap<>();
+        String cloudName = System.getenv("CLOUDINARY_CLOUD_NAME");
+        String apiKey = System.getenv("CLOUDINARY_API_KEY");
+        String apiSecret = System.getenv("CLOUDINARY_API_SECRET");
 
-        config.put("cloud_name", "YOUR_CLOUD_NAME");
-        config.put("api_key", "YOUR_API_KEY");
-        config.put("api_secret", "YOUR_API_SECRET");
-
-        return new Cloudinary(config);
+        return new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret
+        ));
     }
 }

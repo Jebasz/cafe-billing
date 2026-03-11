@@ -19,6 +19,9 @@ public interface ProductService {
 
     void disableProduct(Long id);
 
+    // NEW METHOD (for re-enabling disabled product)
+    void enableProduct(Long id);
+
     List<Product> getProducts(
             Long shopId,
             Long categoryId,

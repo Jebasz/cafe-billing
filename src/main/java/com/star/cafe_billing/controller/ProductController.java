@@ -122,6 +122,12 @@ public class ProductController {
         productService.disableProduct(id);
     }
 
+    // ENABLE PRODUCT (NEW - SAFE ADDITION)
+    @PatchMapping("/{id}/enable")
+    public void enableProduct(@PathVariable Long id){
+        productService.enableProduct(id);
+    }
+
     // GET FAVOURITES
     @GetMapping("/favourites")
     public List<ProductResponse> getFavourites(

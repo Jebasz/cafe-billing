@@ -242,4 +242,16 @@ public class ProductServiceImpl implements ProductService {
                 .favourite(product.getFavourite())
                 .build();
     }
+
+    @Override
+    public void enableProduct(Long id) {
+
+        Product product = productRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setActive(true);
+
+        productRepository.save(product);
+    }
 }

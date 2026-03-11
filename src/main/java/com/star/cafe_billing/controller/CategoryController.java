@@ -22,4 +22,9 @@ public class CategoryController {
 
     }
 
+    @GetMapping("/ping")
+    public String ping(){
+        return "ok";
+    }
+
 }

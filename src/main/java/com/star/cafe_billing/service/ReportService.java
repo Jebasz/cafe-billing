@@ -16,4 +16,5 @@ public interface ReportService {
             LocalDate fromDate,
             LocalDate toDate
     );
+
 }

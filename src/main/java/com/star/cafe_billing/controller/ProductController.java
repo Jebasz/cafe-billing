@@ -85,6 +85,11 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/shop/{shopId}/all")
+    public List<Product> getAllProductsByShop(@PathVariable Long shopId){
+        return productService.getAllProductsByShop(shopId);
+    }
+
     // FILTER PRODUCTS
     @GetMapping
     public List<Product> getProducts(

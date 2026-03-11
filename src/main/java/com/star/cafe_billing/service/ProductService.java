@@ -29,6 +29,8 @@ public interface ProductService {
             Double maxPrice
     );
 
+    List<Product> getAllProductsByShop(Long shopId);
+
     List<ProductResponse> getFavouriteProducts(Long shopId);
 
     void toggleFavourite(Long productId);

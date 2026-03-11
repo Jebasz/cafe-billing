@@ -180,6 +180,11 @@ public class ProductServiceImpl implements ProductService {
                 );
     }
 
+    @Override
+    public List<Product> getAllProductsByShop(Long shopId) {
+        return productRepository.findByShopId(shopId);
+    }
+
     // FAVOURITES
     @Override
     public List<ProductResponse> getFavouriteProducts(Long shopId) {

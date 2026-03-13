@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.star.cafe_billing.dto.ProductRequest;
 import com.star.cafe_billing.dto.ProductResponse;
+import com.star.cafe_billing.dto.ProductResponseDTO;
 import com.star.cafe_billing.entity.Category;
 import com.star.cafe_billing.entity.Product;
 import com.star.cafe_billing.entity.Shop;
@@ -28,7 +29,6 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ShopRepository shopRepository;
     private final SubProductRepository subProductRepository;
-
     private final Cloudinary cloudinary;
 
     // CREATE PRODUCT (JSON API)
@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
-    // CREATE PRODUCT WITH IMAGE (CLOUDINARY)
+    // CREATE PRODUCT WITH IMAGE
     @Override
     public Product createProductWithImage(
             String name,
@@ -90,12 +90,9 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() ->
                             new RuntimeException("SubProduct not found"));
 
-            // Upload image to Cloudinary
             Map uploadResult = cloudinary.uploader().upload(
                     image.getBytes(),
-                    ObjectUtils.asMap(
-                            "folder", "cafe-products"
-                    )
+                    ObjectUtils.asMap("folder", "cafe-products")
             );
 
             String imageUrl = uploadResult.get("secure_url").toString();
@@ -108,8 +105,6 @@ public class ProductServiceImpl implements ProductService {
             product.setShop(shop);
             product.setSubProduct(subProduct);
             product.setActive(true);
-
-            // Save Cloudinary URL
             product.setImageUrl(imageUrl);
 
             return productRepository.save(product);
@@ -150,18 +145,6 @@ public class ProductServiceImpl implements ProductService {
                 .findByCategoryIdAndShopId(categoryId, shopId);
     }
 
-    // DISABLE PRODUCT
-    @Override
-    public void disableProduct(Long id) {
-
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        product.setActive(false);
-
-        productRepository.save(product);
-    }
-
     // PRICE FILTER
     @Override
     public List<Product> getProducts(
@@ -180,9 +163,23 @@ public class ProductServiceImpl implements ProductService {
                 );
     }
 
+    // ⭐ ORIGINAL METHOD (UNCHANGED)
     @Override
     public List<Product> getAllProductsByShop(Long shopId) {
         return productRepository.findByShopId(shopId);
+    }
+
+    // ⭐ NEW METHOD FOR BILLING CACHE
+    @Override
+    public List<ProductResponseDTO> getAllProductsForBilling(Long shopId) {
+
+        List<Product> products =
+                productRepository.findByShopId(shopId);
+
+        return products.stream()
+                .filter(Product::getActive) // only active products
+                .map(this::mapToBillingResponse)
+                .toList();
     }
 
     // FAVOURITES
@@ -237,6 +234,7 @@ public class ProductServiceImpl implements ProductService {
                 );
     }
 
+    // ORIGINAL MAPPER (UNCHANGED)
     private ProductResponse mapToResponse(Product product){
 
         return ProductResponse.builder()
@@ -248,6 +246,21 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    // ⭐ NEW MAPPER ONLY FOR BILLING CACHE
+    private ProductResponseDTO mapToBillingResponse(Product product){
+
+        return ProductResponseDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .imageUrl(product.getImageUrl())
+                .categoryId(product.getCategory().getId())
+                .subProductId(product.getSubProduct().getId())
+                .favourite(product.getFavourite())
+                .build();
+    }
+
+    // ENABLE PRODUCT
     @Override
     public void enableProduct(Long id) {
 
@@ -256,6 +269,18 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         product.setActive(true);
+
+        productRepository.save(product);
+    }
+
+    // DISABLE PRODUCT
+    @Override
+    public void disableProduct(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setActive(false);
 
         productRepository.save(product);
     }

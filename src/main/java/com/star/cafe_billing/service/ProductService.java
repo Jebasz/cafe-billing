@@ -2,6 +2,7 @@ package com.star.cafe_billing.service;
 
 import com.star.cafe_billing.dto.ProductRequest;
 import com.star.cafe_billing.dto.ProductResponse;
+import com.star.cafe_billing.dto.ProductResponseDTO;
 import com.star.cafe_billing.entity.Product;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,4 +48,6 @@ public interface ProductService {
             Long subProductId,
             MultipartFile image
     );
+
+    public List<ProductResponseDTO> getAllProductsForBilling(Long shopId) ;
 }

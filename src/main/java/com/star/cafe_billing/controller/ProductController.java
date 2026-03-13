@@ -2,6 +2,7 @@ package com.star.cafe_billing.controller;
 
 import com.star.cafe_billing.dto.ProductRequest;
 import com.star.cafe_billing.dto.ProductResponse;
+import com.star.cafe_billing.dto.ProductResponseDTO;
 import com.star.cafe_billing.entity.Product;
 import com.star.cafe_billing.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -165,6 +166,13 @@ public class ProductController {
                 subProductId
         );
 
+    }
+
+    @GetMapping("/shop/{shopId}/billing")
+    public List<ProductResponseDTO> getAllProductsForBilling(
+            @PathVariable Long shopId){
+
+        return productService.getAllProductsForBilling(shopId);
     }
 
 }

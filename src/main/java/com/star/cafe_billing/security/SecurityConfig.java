@@ -32,7 +32,12 @@ public class SecurityConfig {
 
                         .requestMatchers("/auth/**")
                         .permitAll()
+
+                        // ✅ Health endpoint for uptime monitoring
+                        .requestMatchers("/internal/health").permitAll()
+
                         .requestMatchers("/uploads/**").permitAll()
+
                         .requestMatchers("/products/**")
                         .hasAnyRole("ADMIN","STAFF")
 
